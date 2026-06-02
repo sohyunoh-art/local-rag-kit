@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+build/
+dist/
+# OMC 등 에디터/툴 잔재
+.omc/
+# 컬렉션 데이터는 기본적으로 ~/.local-rag-kit 에 저장되지만,
+# RAGKIT_HOME 으로 repo 안을 가리킬 경우를 대비해 무시한다.
+.local-rag-kit/
+collections/

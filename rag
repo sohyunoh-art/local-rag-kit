@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# 설치 없이 바로 쓰는 래퍼.  예) ./rag ask "환불 기간"
+# 어디서 실행하든 이 스크립트가 있는 프로젝트 폴더의 ragkit 모듈을 찾는다.
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+exec env PYTHONPATH="$DIR${PYTHONPATH:+:$PYTHONPATH}" python3 -m ragkit.cli "$@"

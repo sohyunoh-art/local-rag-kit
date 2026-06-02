@@ -1,0 +1,70 @@
+{
+  "project": "local-rag-kit",
+  "goal": "목적마다 복사하지 않고 데이터 폴더 + 컬렉션 이름만 바꾸면 되는 범용 로컬 RAG 엔진. 완전 로컬(외부 API/모델 다운로드 없이 BM25 토큰검색)으로 동작하고, 원하면 Ollama 백엔드로 진짜 오프라인 LLM 답변 가능.",
+  "stories": [
+    {
+      "id": "US-001",
+      "title": "범용 문서 로더 (PDF + 마크다운/txt, 확장자 레지스트리)",
+      "passes": true,
+      "acceptanceCriteria": [
+        "loaders.load_path(path)가 .md/.markdown/.txt 파일을 (text, metadata) Document로 읽는다",
+        "PDF는 PyMuPDF가 설치돼 있으면 페이지별 Document로 읽고, 없으면 명확한 안내 예외를 던진다",
+        "디렉터리를 주면 지원 확장자 파일을 재귀적으로 모두 읽는다",
+        "각 Document.metadata에 source(파일경로)와 page/section 식별자가 들어있다"
+      ]
+    },
+    {
+      "id": "US-002",
+      "title": "한글 친화 청킹 + 토크나이저 (순수 함수, 모델 불필요)",
+      "passes": true,
+      "acceptanceCriteria": [
+        "chunk_text가 긴 텍스트를 max_chars/overlap 기준으로 나눈다",
+        "마크다운은 헤딩 경계를 우선 존중해서 나눈다",
+        "tokenize가 한글 단어를 bigram으로 확장해 '데이터셋' 질의가 '데이터셋 코드' 문서에 매칭된다",
+        "tests/test_chunking.py 가 pytest로 통과한다"
+      ]
+    },
+    {
+      "id": "US-003",
+      "title": "BM25 인덱스 (컬렉션별 JSON 영속화)",
+      "passes": true,
+      "acceptanceCriteria": [
+        "Index.add(chunks) 후 Index.search(query, k)가 BM25 점수 내림차순 상위 k개 chunk를 돌려준다",
+        "Index.save/load 로 컬렉션 디렉터리에 JSON으로 저장·복원되고 점수가 동일하게 재현된다",
+        "관련 질의가 무관한 chunk보다 높은 점수를 받는다 (tests/test_index.py 통과)"
+      ]
+    },
+    {
+      "id": "US-004",
+      "title": "교체 가능한 Answerer 백엔드 (echo / ollama / claude_cli, auto 감지)",
+      "passes": true,
+      "acceptanceCriteria": [
+        "backend='echo'는 외부 의존성 없이 검색된 컨텍스트로 결정적 답변 문자열을 만든다",
+        "backend='ollama'는 stdlib urllib로 localhost:11434 /api/generate를 호출한다 (서버 없으면 명확한 예외)",
+        "backend='auto'는 ollama→claude_cli→echo 순으로 사용 가능한 첫 백엔드를 고른다",
+        "프롬프트에 출처 태그가 포함된 컨텍스트와 '컨텍스트 밖이면 모른다고 답하라' 지시가 들어간다"
+      ]
+    },
+    {
+      "id": "US-005",
+      "title": "ingest/ask 파이프라인 + 컬렉션 분리",
+      "passes": true,
+      "acceptanceCriteria": [
+        "pipeline.ingest(collection, paths)가 로드→청킹→인덱스 저장까지 수행하고 chunk 수를 보고한다",
+        "pipeline.ask(collection, question)가 retrieve→answer를 수행하고 answer와 sources를 돌려준다",
+        "서로 다른 컬렉션의 데이터가 섞이지 않는다 (tests/test_pipeline.py 의 echo backend 라운드트립 통과)"
+      ]
+    },
+    {
+      "id": "US-006",
+      "title": "CLI + README (ingest / ask / list / info)",
+      "passes": true,
+      "acceptanceCriteria": [
+        "python -m ragkit.cli ingest --collection X PATH... 가 동작한다",
+        "python -m ragkit.cli ask --collection X \"질문\" [--show-sources] 가 동작한다",
+        "python -m ragkit.cli list / info 가 컬렉션 현황을 출력한다",
+        "README가 완전 로컬 동작·Ollama 전환·새 목적 추가 방법을 설명한다"
+      ]
+    }
+  ]
+}

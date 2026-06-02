@@ -1,0 +1,20 @@
+[project]
+name = "local-rag-kit"
+version = "0.1.0"
+description = "목적마다 복사하지 않는 범용 로컬 RAG 엔진"
+requires-python = ">=3.10"
+# 핵심 검색(청킹·BM25·answerer)은 표준 라이브러리만. PDF 인제스트를 위해 PyMuPDF만 포함.
+dependencies = ["PyMuPDF>=1.24"]
+
+[project.optional-dependencies]
+test = ["pytest>=8.0"]
+
+[project.scripts]
+ragkit = "ragkit.cli:main"
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["ragkit"]

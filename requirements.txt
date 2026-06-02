@@ -1,0 +1,12 @@
+# 핵심 검색 엔진은 표준 라이브러리만으로 동작한다 (완전 로컬, 모델 다운로드 불필요).
+
+# PDF 인제스트용 (PDF를 안 쓰면 생략 가능)
+PyMuPDF>=1.24
+
+# 테스트
+pytest>=8.0
+
+# 선택: 완전 오프라인 LLM 답변을 원하면 Ollama 를 별도 설치
+#   1) https://ollama.com 에서 설치
+#   2) ollama pull llama3.2   (또는 원하는 모델)
+#   3) ragkit ask ... --backend ollama

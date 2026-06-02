@@ -1,0 +1,31 @@
+local-rag-kit — 진행 기록
+================================
+
+목표: 목적마다 프로젝트를 복사하던 패턴(navlue-spec-rag, outline-rag-assistant)을
+하나의 범용 엔진 + 컬렉션 분리로 일반화. 완전 로컬(외부 API/모델 다운로드 불필요).
+
+[설계 결정]
+- 검색: 임베딩/벡터DB 대신 BM25(표준 라이브러리만). 모델 다운로드·GPU 불필요 → "빠르게 학습(색인)" 목표에 부합.
+- 한글: 형태소 분석기 없이 bigram 확장 토크나이저로 부분 매칭 확보 ('데이터셋'→'데이','이터','터셋'+원형).
+- 답변 백엔드 교체형: echo(오프라인/테스트) / ollama(완전 오프라인 LLM) / claude_cli. auto=ollama→claude_cli→echo.
+- 컬렉션별 JSON 인덱스를 RAGKIT_HOME(기본 ~/.local-rag-kit)에 저장 → repo 오염 없음, 목적별 격리.
+- 로더는 확장자 레지스트리(register) → 새 포맷 한 줄 추가. PDF는 PyMuPDF 페이지별, MD/txt는 헤딩 청킹.
+
+[구현 파일]
+- ragkit/{config,loaders,chunking,index,answerer,pipeline,cli}.py
+- tests/{test_chunking,test_index,test_pipeline}.py
+- examples/docs/sample.md, README.md, requirements.txt
+
+[검증 결과]
+- pytest: 14 passed (chunking/index/pipeline). 인덱스 save/load 점수 재현 확인.
+- 스모크: tokenizer bigram, BM25 랭킹(관련>무관, 무관질의=빈결과), examples 인제스트 OK.
+- CLI end-to-end: ingest/list/info/ask 모두 동작. auto 백엔드가 claude CLI 감지해 근거 기반 답변 생성 확인.
+- PDF 로더: PyMuPDF 설치 후 별도 검증.
+
+[환경 메모]
+- 이 머신은 python3-venv 미설치 + PEP668(externally-managed). pip은 --user --break-system-packages 필요.
+- /mnt/c (Windows 마운트)라 .pytest_cache 생성 권한 경고 뜨지만 테스트 결과엔 영향 없음.
+
+[다음 단계 후보]
+- 의미 검색이 필요하면 Ollama 임베딩(nomic-embed-text) 벡터 백엔드를 index 인터페이스(add/search) 유지한 채 추가.
+- 대용량은 JSON → SQLite/FAISS 교체.
