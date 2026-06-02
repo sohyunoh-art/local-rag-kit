@@ -3,7 +3,7 @@
 **목적마다 통째로 복사하지 않는 범용 로컬 RAG 엔진.**
 데이터 폴더 + 컬렉션 이름만 바꾸면 새 목적의 RAG가 된다.
 
-기존에 `navlue-spec-rag`, `outline-rag-assistant` 처럼 목적마다 프로젝트를 복제하던 패턴을, **하나의 엔진 + 컬렉션 분리**로 일반화한 것이다.
+`navlue-spec-rag`, `outline-rag-assistant` 처럼 목적마다 프로젝트를 통째로 복제하던 걸, **엔진 하나에 컬렉션만 나누는** 방식으로 일반화했다.
 
 ```
 [문서 폴더] --ingest--> [컬렉션별 BM25 인덱스] --ask--> [검색 → 답변 백엔드]
@@ -18,7 +18,7 @@
 
 ## 설치 (어디서나 쓰는 `ragkit` 명령)
 
-한 번 설치하면 **어느 폴더에서든** `ragkit` 명령을 쓸 수 있다. 컬렉션 데이터는 프로젝트가 아니라 `~/.local-rag-kit` 에 저장되므로, 설치 후엔 프로젝트 폴더가 어디 있든 상관없다.
+한 번 설치하면 **어느 폴더에서든** `ragkit` 명령을 쓸 수 있다. 컬렉션 데이터는 프로젝트가 아니라 `~/.local-rag-kit` 에 쌓이기 때문에 설치 후엔 프로젝트 폴더가 어디 있든 상관없다.
 
 ```bash
 # GitHub 저장소에서 바로 설치 (USER/REPO 를 본인 것으로)
@@ -83,7 +83,7 @@ python -m ragkit.cli ask --collection demo "질문" --backend ollama
 # 모델/주소 변경: OLLAMA_MODEL, OLLAMA_URL 환경변수
 ```
 
-`--backend auto`는 Ollama가 떠 있으면 자동으로 쓰고, 없으면 `claude` CLI, 그것도 없으면 `echo`로 폴백한다.
+`--backend auto`는 Ollama가 떠 있으면 그걸 쓰고 없으면 `claude` CLI, 그것마저 없으면 `echo`로 넘어간다.
 
 ## 지원 포맷 / 확장
 
@@ -112,7 +112,7 @@ config.py       # 경로(RAGKIT_HOME)·기본값
 
 ## 한계 / 다음 단계
 
-- 기본 검색은 BM25(어휘 매칭)다. 동의어·의미 검색이 더 필요하면 Ollama 임베딩(`nomic-embed-text`) 기반 벡터 검색을 `index.py` 옆에 백엔드로 추가하면 된다 — 인터페이스(`add`/`search`)는 그대로 둔 채 교체 가능하도록 설계돼 있다.
+- 기본 검색은 BM25(어휘 매칭)다. 동의어나 의미 기반 검색까지 원하면 Ollama 임베딩(`nomic-embed-text`) 벡터 검색을 `index.py` 옆에 백엔드로 붙이면 된다. `add`/`search` 인터페이스는 그대로 두고 검색기만 갈아끼울 수 있게 짜놨다.
 - 대용량(수십만 chunk)에서는 JSON 인덱스 대신 SQLite/FAISS로 교체 권장.
 
 ## 테스트
