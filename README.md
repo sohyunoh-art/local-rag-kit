@@ -21,15 +21,15 @@
 한 번 설치하면 **어느 폴더에서든** `ragkit` 명령을 쓸 수 있다. 컬렉션 데이터는 프로젝트가 아니라 `~/.local-rag-kit` 에 쌓이기 때문에 설치 후엔 프로젝트 폴더가 어디 있든 상관없다.
 
 ```bash
-# GitHub 저장소에서 바로 설치 (USER/REPO 를 본인 것으로)
-pip install "git+https://github.com/USER/local-rag-kit.git"
+# GitHub 저장소에서 바로 설치
+pip install "git+https://github.com/sohyunoh-art/local-rag-kit.git"
 
 # 또는 클론 후 설치
-git clone https://github.com/USER/local-rag-kit.git
+git clone https://github.com/sohyunoh-art/local-rag-kit.git
 pip install ./local-rag-kit
 
 # CLI 도구로 격리 설치하고 싶으면 pipx 권장
-pipx install "git+https://github.com/USER/local-rag-kit.git"
+pipx install "git+https://github.com/sohyunoh-art/local-rag-kit.git"
 ```
 
 > PEP 668(외부 관리형 파이썬)에서 막히면 `pip install --user --break-system-packages ...` 또는 `pipx` 를 쓴다.
